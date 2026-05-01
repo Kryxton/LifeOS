@@ -208,10 +208,10 @@ export default function Training({ state, updateTrainingPhase, addSkillMetrics }
                 <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 border-b border-zinc-900 pb-2">Skill Metrics</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { label: 'Max Pullups', value: state.skillMetrics[0]?.maxPullups || 0 },
-                    { label: 'Max Dips', value: state.skillMetrics[0]?.maxDips || 0 },
-                    { label: 'Planche Lean', value: (state.skillMetrics[0]?.plancheLeanTime || 0) + 's' },
-                    { label: 'Tuck Planche', value: (state.skillMetrics[0]?.tuckPlancheTime || 0) + 's' },
+                    { label: 'Max Pullups', value: (state.skillMetrics || [])[0]?.maxPullups || 0 },
+                    { label: 'Max Dips', value: (state.skillMetrics || [])[0]?.maxDips || 0 },
+                    { label: 'Planche Lean', value: ((state.skillMetrics || [])[0]?.plancheLeanTime || 0) + 's' },
+                    { label: 'Tuck Planche', value: ((state.skillMetrics || [])[0]?.tuckPlancheTime || 0) + 's' },
                   ].map((m, i) => (
                     <div key={i} className="space-y-1">
                       <span className="text-[9px] uppercase font-bold text-zinc-600">{m.label}</span>
@@ -226,11 +226,11 @@ export default function Training({ state, updateTrainingPhase, addSkillMetrics }
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <span className="text-[9px] uppercase font-bold text-zinc-600">Weight</span>
-                    <div className="text-xl font-mono font-bold">{state.skillMetrics[0]?.bodyweight || 0}kg</div>
+                    <div className="text-xl font-mono font-bold">{(state.skillMetrics || [])[0]?.bodyweight || 0}kg</div>
                   </div>
                   <div className="space-y-1">
                     <span className="text-[9px] uppercase font-bold text-zinc-600">Bodyfat</span>
-                    <div className="text-xl font-mono font-bold">{state.skillMetrics[0]?.bodyfat || 0}%</div>
+                    <div className="text-xl font-mono font-bold">{(state.skillMetrics || [])[0]?.bodyfat || 0}%</div>
                   </div>
                 </div>
               </section>

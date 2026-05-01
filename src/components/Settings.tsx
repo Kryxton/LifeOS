@@ -80,7 +80,7 @@ export default function Settings({ state, setIdentity, addChore }: SettingsProps
         </form>
 
         <div className="space-y-2">
-          {state.chores.map((chore) => (
+          {(state.chores || []).map((chore) => (
             <div key={chore.id} className="flex items-center justify-between p-3 border border-zinc-900 bg-black">
               <span className="text-sm">{chore.title}</span>
               <button className="text-zinc-700 hover:text-red-500 transition-colors">

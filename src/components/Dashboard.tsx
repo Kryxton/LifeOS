@@ -36,7 +36,8 @@ export default function Dashboard({
 }: DashboardProps) {
   const yesterdayDate = subDays(new Date(), 1);
   const yesterdayKey = format(yesterdayDate, 'yyyy-MM-dd');
-  const yesterdayLog = state.dailyLogs[yesterdayKey];
+  const dailyLogs = state.dailyLogs || {};
+  const yesterdayLog = dailyLogs[yesterdayKey];
   const yesterdayScore = yesterdayLog ? calculateScore(yesterdayLog) : 0;
 
   const handleTaskToggle = (id: string) => {

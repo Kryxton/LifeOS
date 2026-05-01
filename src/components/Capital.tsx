@@ -11,7 +11,8 @@ interface CapitalProps {
 
 export default function Capital({ state, streaks, addFinancialLog }: CapitalProps) {
   const totals = useMemo(() => {
-    return state.financialLogs.reduce((acc, log) => {
+    const logs = state.financialLogs || [];
+    return logs.reduce((acc, log) => {
       if (log.type === 'SAVINGS') acc.saved += log.amount;
       if (log.type === 'INVESTMENT') acc.invested += log.amount;
       return acc;

@@ -74,7 +74,7 @@ export default function Reviews({ state, addWeeklyReview }: ReviewsProps) {
       <div className="space-y-4">
         <h3 className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest border-b border-zinc-900 pb-2">Review Archive</h3>
         <div className="space-y-3">
-          {state.weeklyReviews.map((review) => (
+          {(state.weeklyReviews || []).map((review) => (
             <details key={review.id} className="group bg-zinc-950 border border-zinc-900">
               <summary className="flex items-center justify-between p-4 cursor-pointer list-none">
                 <div className="flex items-center gap-3">
