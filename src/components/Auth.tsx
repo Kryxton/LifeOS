@@ -40,6 +40,12 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
               System Error: Configuration Missing in Vercel
             </div>
           )}
+          
+          <div className="mt-2 text-[8px] text-zinc-700 font-mono uppercase text-center space-y-1">
+            <p>Debug Info:</p>
+            <p>URL: {import.meta.env.VITE_SUPABASE_URL ? `${import.meta.env.VITE_SUPABASE_URL.substring(0, 15)}...` : 'NOT FOUND'}</p>
+            <p>KEY: {import.meta.env.VITE_SUPABASE_ANON_KEY ? 'DETECTED (OK)' : 'NOT FOUND'}</p>
+          </div>
         </div>
 
         <form onSubmit={handleAuth} className="space-y-4">
@@ -94,4 +100,3 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
     </div>
   );
 }
-
