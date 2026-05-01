@@ -62,9 +62,17 @@ export default function App() {
     return getDailyLog(state, new Date());
   }, [state]);
 
-  const pornStreak = useMemo(() => state ? getStreak(state, 'porn') : 0, [state]);
-  const gamblingStreak = useMemo(() => state ? getStreak(state, 'gambling') : 0, [state]);
-  const trainingStreak = useMemo(() => state ? getStreak(state, 'training') : 0, [state]);
+  const pornStreak = useMemo(() => {
+    try { return state ? getStreak(state, 'porn') : 0; } catch(e) { return 0; }
+  }, [state]);
+  
+  const gamblingStreak = useMemo(() => {
+    try { return state ? getStreak(state, 'gambling') : 0; } catch(e) { return 0; }
+  }, [state]);
+
+  const trainingStreak = useMemo(() => {
+    try { return state ? getStreak(state, 'training') : 0; } catch(e) { return 0; }
+  }, [state]);
 
   if (!state || !activeLog) {
     return (
