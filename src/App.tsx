@@ -58,21 +58,27 @@ export default function App() {
 
   // Safety check: ensure state exists before calculating metrics
   const activeLog = useMemo(() => {
-    if (!state) return null;
-    return getDailyLog(state, new Date());
+    try {
+      if (!state) return null;
+      return getDailyLog(state, new Date());
+    } catch (e) {
+      console.error("activeLog error", e);
+      return null;
+    }
   }, [state]);
 
-  const pornStreak = useMemo(() => {
-    try { return state ? getStreak(state, 'porn') : 0; } catch(e) { return 0; }
-  }, [state]);
-  
-  const gamblingStreak = useMemo(() => {
-    try { return state ? getStreak(state, 'gambling') : 0; } catch(e) { return 0; }
+  const streaks = useMemo(() => {
+    if (!state) return { porn: 0, gambling: 0, training: 0 };
+    return {
+      porn: getStreak(state, 'porn'),
+      gambling: getStreak(state, 'gambling'),
+      training: getStreak(state, 'training')
+    };
   }, [state]);
 
-  const trainingStreak = useMemo(() => {
-    try { return state ? getStreak(state, 'training') : 0; } catch(e) { return 0; }
-  }, [state]);
+  if (!session) {
+    return <Auth onAuth={() => {}} />;
+  }
 
   if (!state || !activeLog) {
     return (
@@ -106,15 +112,15 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'dashboard': return <Dashboard {...appProps} log={activeLog} streaks={{ porn: pornStreak, gambling: gamblingStreak, training: trainingStreak }} toggleChore={appProps.toggleChore} setCurrentVersion={appProps.setCurrentVersion} setEarningFor={appProps.setEarningFor} />;
-      case 'discipline': return <Discipline streaks={{ porn: pornStreak, gambling: gamblingStreak }} relapsed={appProps.relapsed} />;
+      case 'dashboard': return <Dashboard {...appProps} log={activeLog} streaks={streaks} toggleChore={appProps.toggleChore} setCurrentVersion={appProps.setCurrentVersion} setEarningFor={appProps.setEarningFor} />;
+      case 'discipline': return <Discipline streaks={streaks} relapsed={appProps.relapsed} />;
       case 'training': return <Training state={state} updateTrainingPhase={appProps.updateTrainingPhase} addSkillMetrics={appProps.addSkillMetrics} />;
       case 'growth': return <Growth {...appProps} log={activeLog} />;
-      case 'capital': return <Capital {...appProps} streaks={{ gambling: gamblingStreak }} />;
+      case 'capital': return <Capital {...appProps} streaks={streaks} />;
       case 'reviews': return <Reviews {...appProps} />;
       case 'settings': return <Settings {...appProps} />;
       case 'contract': return <Contract />;
-      default: return <Dashboard {...appProps} log={activeLog} streaks={{ porn: pornStreak, gambling: gamblingStreak, training: trainingStreak }} />;
+      default: return <Dashboard {...appProps} log={activeLog} streaks={streaks} />;
     }
   };
 
@@ -129,7 +135,7 @@ export default function App() {
         <div className="flex gap-4">
           <div className="flex items-center gap-1.5">
             <Flame className="w-4 h-4 text-orange-500" />
-            <span className="text-xs font-mono">{pornStreak}d</span>
+            <span className="text-xs font-mono">{streaks.porn}d</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Target className="w-4 h-4 text-blue-500" />

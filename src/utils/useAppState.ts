@@ -5,61 +5,38 @@ import { format } from 'date-fns';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export const useAppState = () => {
-  const [state, setState] = useState<AppState>(loadState());
+  const [state, setState] = useState<AppState>(() => loadState());
 
-  // Load from Cloud on startup
+  // Load from Cloud (ONLY ONCE ON LOGIN)
   useEffect(() => {
-    let mounted = true;
+    let syncDone = false;
+    
+    const initialSync = async () => {
+      if (!isSupabaseConfigured() || syncDone) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
 
-    const syncFromCloud = async () => {
-      try {
-        if (!isSupabaseConfigured()) return;
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session || !mounted) return;
-
-        const { data, error } = await supabase
-          .from('user_data')
-          .select('payload')
-          .eq('id', session.user.id);
-
-        if (error) {
-          console.error("Supabase Error:", error);
-          return;
-        }
-
-        // Check if we actually got data back
-        if (data && data.length > 0 && data[0].payload) {
-          const cloudData = data[0].payload;
-          
-          setState(prev => {
-            // Only merge if the state actually has the required structure
-            const base = prev || loadState();
-            return {
-              ...base,
-              ...cloudData,
-              dailyLogs: { ...(base.dailyLogs || {}), ...(cloudData.dailyLogs || {}) },
-              chores: cloudData.chores || base.chores || [],
-              skillMetrics: cloudData.skillMetrics || base.skillMetrics || [],
-              financialLogs: cloudData.financialLogs || base.financialLogs || [],
-              weeklyReviews: cloudData.weeklyReviews || base.weeklyReviews || [],
-            };
-          });
-        }
-      } catch (err) {
-        console.error("Failed to sync from cloud:", err);
+      const { data } = await supabase.from('user_data').select('payload').eq('id', session.user.id).maybeSingle();
+      
+      if (data?.payload) {
+        setState(current => ({
+          ...current,
+          ...data.payload,
+          dailyLogs: { ...(current.dailyLogs || {}), ...(data.payload.dailyLogs || {}) }
+        }));
       }
+      syncDone = true;
     };
 
-    syncFromCloud();
-    return () => { mounted = false; };
+    initialSync();
   }, []);
 
-  // Save to Cloud & Local on every change
+  // Save changes
   useEffect(() => {
+    if (!state) return;
     saveState(state);
-    
-    const syncToCloud = async () => {
-      if (!isSupabaseConfigured()) return;
+
+    const timer = setTimeout(async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
@@ -67,11 +44,10 @@ export const useAppState = () => {
         id: session.user.id,
         payload: state,
         updated_at: new Date().toISOString()
-      });
-    };
+      }, { onConflict: 'id' });
+    }, 2000);
 
-    const timeout = setTimeout(syncToCloud, 1000); // Debounce saves
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(timer);
   }, [state]);
 
   const updateDailyLog = useCallback((date: Date, updater: (log: DailyLog) => DailyLog) => {
