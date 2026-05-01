@@ -35,11 +35,24 @@ const INITIAL_STATE: AppState = {
 };
 
 export const loadState = (): AppState => {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (!data) return INITIAL_STATE;
   try {
-    return JSON.parse(data);
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return INITIAL_STATE;
+    
+    const parsed = JSON.parse(data);
+    // Basic validation to ensure it's a valid object
+    if (!parsed || typeof parsed !== 'object') return INITIAL_STATE;
+    
+    // Ensure critical arrays exist
+    return {
+      ...INITIAL_STATE,
+      ...parsed,
+      dailyLogs: parsed.dailyLogs || {},
+      chores: parsed.chores || INITIAL_STATE.chores,
+      skillMetrics: parsed.skillMetrics || [],
+    };
   } catch (e) {
+    console.error("Failed to load local state:", e);
     return INITIAL_STATE;
   }
 };
@@ -143,3 +156,4 @@ export const getStreak = (state: AppState, type: 'porn' | 'gambling' | 'training
   }
   return streak;
 };
+
