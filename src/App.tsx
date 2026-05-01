@@ -68,27 +68,35 @@ export default function App() {
   }, [state]);
 
   const streaks = useMemo(() => {
-    if (!state) return { porn: 0, gambling: 0, training: 0 };
-    return {
-      porn: getStreak(state, 'porn'),
-      gambling: getStreak(state, 'gambling'),
-      training: getStreak(state, 'training')
-    };
+    try {
+      if (!state) return { porn: 0, gambling: 0, training: 0 };
+      return {
+        porn: getStreak(state, 'porn') || 0,
+        gambling: getStreak(state, 'gambling') || 0,
+        training: getStreak(state, 'training') || 0
+      };
+    } catch (e) {
+      return { porn: 0, gambling: 0, training: 0 };
+    }
   }, [state]);
 
-  if (!session) {
+  if (isSupabaseConfigured() && !session) {
     return <Auth onAuth={() => {}} />;
   }
 
   if (!state || !activeLog) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
-        <div className="animate-pulse text-zinc-500 font-mono text-[10px] uppercase tracking-[0.2em]">Initializing Life OS...</div>
+        <div className="animate-pulse text-zinc-500 font-mono text-[10px] uppercase tracking-[0.2em]">System Initializing...</div>
         <button 
-          onClick={() => supabase.auth.signOut()}
+          onClick={() => {
+            localStorage.clear();
+            supabase.auth.signOut();
+            window.location.reload();
+          }}
           className="text-[9px] text-zinc-800 uppercase font-bold tracking-widest hover:text-zinc-500 transition-colors"
         >
-          Reset Session
+          Wipe Data & Logout
         </button>
       </div>
     );

@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get and clean keys
+// Get and clean keys - check both naming conventions
 const rawUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || '';
 
 // More aggressive cleaning: remove all trailing slashes and whitespace
 export const supabaseUrl = rawUrl.trim().split('?')[0].replace(/\/+$/, '');

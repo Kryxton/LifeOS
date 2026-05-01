@@ -114,20 +114,26 @@ export const getDailyLog = (state: AppState, date: Date): DailyLog => {
 };
 
 export const calculateScore = (log: DailyLog): number => {
+  if (!log || !log.tasks) return 0;
   if (log.isUrgeFailed) return 0;
   
-  const totalWeight = log.tasks.reduce((sum, t) => sum + t.weight, 0);
-  const completedWeight = log.tasks.reduce((sum, t) => sum + (t.completed ? t.weight : 0), 0);
-  
-  // Discipline Check: Porn and Gambling are critical
-  const pornTask = log.tasks.find(t => t.label === 'No Porn');
-  const gamblingTask = log.tasks.find(t => t.label === 'No Gambling');
-  
-  if ((pornTask && !pornTask.completed) || (gamblingTask && !gamblingTask.completed)) {
-    return 0; // Automatic red day
-  }
+  try {
+    const totalWeight = log.tasks.reduce((sum, t) => sum + (t.weight || 0), 0);
+    const completedWeight = log.tasks.reduce((sum, t) => sum + (t.completed ? (t.weight || 0) : 0), 0);
+    
+    // Discipline Check: Porn and Gambling are critical
+    const pornTask = log.tasks.find(t => t.label === 'No Porn');
+    const gamblingTask = log.tasks.find(t => t.label === 'No Gambling');
+    
+    if ((pornTask && !pornTask.completed) || (gamblingTask && !gamblingTask.completed)) {
+      return 0; // Automatic red day
+    }
 
-  return Math.round((completedWeight / totalWeight) * 100);
+    if (totalWeight === 0) return 0;
+    return Math.round((completedWeight / totalWeight) * 100);
+  } catch (e) {
+    return 0;
+  }
 };
 
 export const getStreak = (state: AppState, type: 'porn' | 'gambling' | 'training'): number => {

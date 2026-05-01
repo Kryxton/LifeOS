@@ -5,30 +5,42 @@ import { format } from 'date-fns';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export const useAppState = () => {
-  const [state, setState] = useState<AppState>(() => loadState());
+  const [state, setState] = useState<AppState>(loadState);
 
   // Load from Cloud (ONLY ONCE ON LOGIN)
   useEffect(() => {
-    let syncDone = false;
+    let mounted = true;
     
     const initialSync = async () => {
-      if (!isSupabaseConfigured() || syncDone) return;
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      try {
+        if (!isSupabaseConfigured()) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session || !mounted) return;
 
-      const { data } = await supabase.from('user_data').select('payload').eq('id', session.user.id).maybeSingle();
-      
-      if (data?.payload) {
-        setState(current => ({
-          ...current,
-          ...data.payload,
-          dailyLogs: { ...(current.dailyLogs || {}), ...(data.payload.dailyLogs || {}) }
-        }));
+        const { data, error } = await supabase
+          .from('user_data')
+          .select('payload')
+          .eq('id', session.user.id);
+        
+        if (error) throw error;
+
+        if (data && data.length > 0 && data[0].payload && mounted) {
+          const cloud = data[0].payload;
+          setState(current => ({
+            ...current,
+            ...cloud,
+            dailyLogs: { ...(current?.dailyLogs || {}), ...(cloud.dailyLogs || {}) },
+            chores: cloud.chores || current?.chores || [],
+            skillMetrics: cloud.skillMetrics || current?.skillMetrics || [],
+          }));
+        }
+      } catch (e) {
+        console.error("Sync failed", e);
       }
-      syncDone = true;
     };
 
     initialSync();
+    return () => { mounted = false; };
   }, []);
 
   // Save changes
