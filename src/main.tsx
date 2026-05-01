@@ -3,36 +3,30 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App";
 
-class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
+class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, errorText: string}> {
   constructor(props: any) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, errorText: "" };
   }
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: any, errorInfo: any) {
-    console.error("ErrorBoundary caught:", error, errorInfo);
-    localStorage.setItem('last_system_error', error?.message || error?.toString() || 'Unknown Crash');
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, errorText: error?.message || error?.toString() || "Unknown Error" };
   }
 
   render() {
     if (this.state.hasError) {
-      const lastError = localStorage.getItem('last_system_error');
       return (
         <div className="min-h-screen bg-black text-zinc-100 flex flex-col items-center justify-center p-6 text-center">
-          <h1 className="text-xl font-black uppercase tracking-tighter mb-4">System Recovery</h1>
-          <div className="bg-red-950/20 border border-red-900 p-4 mb-8 max-w-sm">
-            <p className="text-[10px] text-red-500 uppercase font-bold mb-2 tracking-widest">Error Diagnostic</p>
-            <p className="text-xs font-mono text-zinc-400 break-all">{lastError || "No diagnostic log found"}</p>
+          <h1 className="text-xl font-black uppercase tracking-tighter mb-4">System Crash Detected</h1>
+          <div className="bg-red-950/20 border border-red-900 p-6 mb-8 max-w-sm w-full">
+            <p className="text-[10px] text-red-500 uppercase font-bold mb-4 tracking-widest">Diagnostic Output</p>
+            <p className="text-xs font-mono text-zinc-300 break-all text-left">{this.state.errorText}</p>
           </div>
           <button 
             onClick={() => { localStorage.clear(); window.location.reload(); }}
-            className="px-8 py-4 bg-zinc-100 text-black text-xs font-bold uppercase tracking-widest"
+            className="w-full max-w-sm py-4 bg-zinc-100 text-black text-xs font-bold uppercase tracking-widest"
           >
-            Wipe Data & Restart
+            Clear Data & Restart
           </button>
         </div>
       );

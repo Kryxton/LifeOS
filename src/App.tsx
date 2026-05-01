@@ -68,35 +68,27 @@ export default function App() {
   }, [state]);
 
   const streaks = useMemo(() => {
-    try {
-      if (!state) return { porn: 0, gambling: 0, training: 0 };
-      return {
-        porn: getStreak(state, 'porn') || 0,
-        gambling: getStreak(state, 'gambling') || 0,
-        training: getStreak(state, 'training') || 0
-      };
-    } catch (e) {
-      return { porn: 0, gambling: 0, training: 0 };
-    }
+    if (!state) return { porn: 0, gambling: 0, training: 0 };
+    return {
+      porn: getStreak(state, 'porn'),
+      gambling: getStreak(state, 'gambling'),
+      training: getStreak(state, 'training')
+    };
   }, [state]);
 
-  if (isSupabaseConfigured() && !session) {
+  if (!session) {
     return <Auth onAuth={() => {}} />;
   }
 
   if (!state || !activeLog) {
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
-        <div className="animate-pulse text-zinc-500 font-mono text-[10px] uppercase tracking-[0.2em]">System Initializing...</div>
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 text-center">
+        <div className="animate-pulse text-zinc-500 font-mono text-[10px] uppercase tracking-[0.2em] mb-4">Initializing Life OS...</div>
         <button 
-          onClick={() => {
-            localStorage.clear();
-            supabase.auth.signOut();
-            window.location.reload();
-          }}
-          className="text-[9px] text-zinc-800 uppercase font-bold tracking-widest hover:text-zinc-500 transition-colors"
+          onClick={() => { localStorage.clear(); supabase.auth.signOut(); window.location.reload(); }}
+          className="text-[10px] text-zinc-800 border border-zinc-900 px-4 py-2 uppercase font-bold hover:bg-zinc-900 transition-colors"
         >
-          Wipe Data & Logout
+          Force Reset
         </button>
       </div>
     );
