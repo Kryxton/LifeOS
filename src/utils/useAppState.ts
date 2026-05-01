@@ -6,7 +6,6 @@ import { supabase, isSupabaseConfigured } from './supabase';
 
 export const useAppState = () => {
   const [state, setState] = useState<AppState>(loadState());
-  const [isSyncing, setIsSyncing] = useState(false);
 
   // Load from Cloud on startup
   useEffect(() => {
@@ -28,7 +27,6 @@ export const useAppState = () => {
         }
 
         if (data?.payload) {
-<<<<<<< HEAD
           setState(prev => {
             // Start with a fresh initial state, then apply cloud data, then current session
             const newState = {
@@ -45,18 +43,6 @@ export const useAppState = () => {
               earningFor: data.payload.earningFor || prev.earningFor
             };
             return newState;
-=======
-          // Merge or set state with deep defaults to prevent missing properties
-          setState(prev => {
-            const merged = { ...prev, ...data.payload };
-            // Ensure nested objects/arrays exist
-            merged.dailyLogs = merged.dailyLogs || {};
-            merged.chores = merged.chores || prev.chores || [];
-            merged.skillMetrics = merged.skillMetrics || prev.skillMetrics || [];
-            merged.financialLogs = merged.financialLogs || prev.financialLogs || [];
-            merged.weeklyReviews = merged.weeklyReviews || prev.weeklyReviews || [];
-            return merged;
->>>>>>> 2d703cd56f55d371042338a2694add549d9124b6
           });
         }
       } catch (err) {
@@ -75,13 +61,11 @@ export const useAppState = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      setIsSyncing(true);
       await supabase.from('user_data').upsert({
         id: session.user.id,
         payload: state,
         updated_at: new Date().toISOString()
       });
-      setIsSyncing(false);
     };
 
     const timeout = setTimeout(syncToCloud, 1000); // Debounce saves

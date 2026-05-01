@@ -166,4 +166,3 @@ export const getStreak = (state: AppState, type: 'porn' | 'gambling' | 'training
   }
   return streak;
 };
-
