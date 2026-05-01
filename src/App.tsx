@@ -68,8 +68,14 @@ export default function App() {
 
   if (!state || !activeLog) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
         <div className="animate-pulse text-zinc-500 font-mono text-[10px] uppercase tracking-[0.2em]">Initializing Life OS...</div>
+        <button 
+          onClick={() => supabase.auth.signOut()}
+          className="text-[9px] text-zinc-800 uppercase font-bold tracking-widest hover:text-zinc-500 transition-colors"
+        >
+          Reset Session
+        </button>
       </div>
     );
   }
@@ -203,3 +209,4 @@ export default function App() {
     </div>
   );
 }
+
