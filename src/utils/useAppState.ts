@@ -11,18 +11,31 @@ export const useAppState = () => {
   // Load from Cloud on startup
   useEffect(() => {
     const syncFromCloud = async () => {
-      if (!isSupabaseConfigured()) return;
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      try {
+        if (!isSupabaseConfigured()) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
 
-      const { data, error } = await supabase
-        .from('user_data')
-        .select('payload')
-        .eq('id', session.user.id)
-        .single();
+        const { data, error } = await supabase
+          .from('user_data')
+          .select('payload')
+          .eq('id', session.user.id)
+          .maybeSingle(); // maybeSingle allows for 0 rows without error
 
-      if (data?.payload) {
-        setState(data.payload);
+        if (error) {
+          console.error("Cloud Load Error:", error);
+          return;
+        }
+
+        if (data?.payload) {
+          // Merge or set state
+          setState(prev => ({
+            ...prev,
+            ...data.payload
+          }));
+        }
+      } catch (err) {
+        console.error("Critical Sync Error:", err);
       }
     };
     syncFromCloud();
