@@ -35,11 +35,24 @@ const INITIAL_STATE: AppState = {
 };
 
 export const loadState = (): AppState => {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (!data) return INITIAL_STATE;
   try {
-    return JSON.parse(data);
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return INITIAL_STATE;
+    
+    const parsed = JSON.parse(data);
+    // Basic validation to ensure it's a valid object
+    if (!parsed || typeof parsed !== 'object') return INITIAL_STATE;
+    
+    // Ensure critical arrays exist
+    return {
+      ...INITIAL_STATE,
+      ...parsed,
+      dailyLogs: parsed.dailyLogs || {},
+      chores: parsed.chores || INITIAL_STATE.chores,
+      skillMetrics: parsed.skillMetrics || [],
+    };
   } catch (e) {
+    console.error("Failed to load local state:", e);
     return INITIAL_STATE;
   }
 };
@@ -50,9 +63,15 @@ export const saveState = (state: AppState) => {
 
 export const getDailyLog = (state: AppState, date: Date): DailyLog => {
   const dateKey = format(date, 'yyyy-MM-dd');
+  
+  // Safety check: ensure dailyLogs exists
+  if (!state.dailyLogs) {
+    state.dailyLogs = {};
+  }
+  
   const existing = state.dailyLogs[dateKey];
   
-  if (existing) {
+  if (existing && existing.tasks && existing.reflection) {
     // Lock if older than yesterday
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -68,7 +87,7 @@ export const getDailyLog = (state: AppState, date: Date): DailyLog => {
 
   // Create new log for the day
   const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-  const tasks = DEFAULT_TASKS.filter(t => {
+  const tasks = (DEFAULT_TASKS || []).filter(t => {
     if (t.weekdayOnly && isWeekend) return false;
     if (t.weekendOnly && !isWeekend) return false;
     return true;
@@ -112,22 +131,32 @@ export const calculateScore = (log: DailyLog): number => {
 };
 
 export const getStreak = (state: AppState, type: 'porn' | 'gambling' | 'training'): number => {
+  if (!state) return 0;
+
   if (type === 'porn') {
     if (!state.lastPornRelapse) return 0;
-    const diff = new Date().getTime() - new Date(state.lastPornRelapse).getTime();
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
+    try {
+      const diff = new Date().getTime() - new Date(state.lastPornRelapse).getTime();
+      return Math.floor(diff / (1000 * 60 * 60 * 24));
+    } catch (e) { return 0; }
   }
   if (type === 'gambling') {
     if (!state.lastGamblingRelapse) return 0;
-    const diff = new Date().getTime() - new Date(state.lastGamblingRelapse).getTime();
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
+    try {
+      const diff = new Date().getTime() - new Date(state.lastGamblingRelapse).getTime();
+      return Math.floor(diff / (1000 * 60 * 60 * 24));
+    } catch (e) { return 0; }
   }
   
   // Training streak logic
   let streak = 0;
-  const dates = Object.keys(state.dailyLogs).sort().reverse();
+  const dailyLogs = state.dailyLogs || {};
+  const dates = Object.keys(dailyLogs).sort().reverse();
+  
   for (const dateKey of dates) {
-    const log = state.dailyLogs[dateKey];
+    const log = dailyLogs[dateKey];
+    if (!log || !log.tasks) continue;
+    
     const trainingDone = log.tasks.find(t => t.label === 'Training Done')?.completed;
     if (trainingDone) {
       streak++;

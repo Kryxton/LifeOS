@@ -24,6 +24,8 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
     setLoading(false);
   };
 
+  const configMissing = !import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY;
+
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-8">
@@ -33,6 +35,11 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
           </div>
           <h1 className="text-2xl font-black uppercase tracking-tighter text-zinc-100">Life OS Access</h1>
           <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold">Secure Personal Command Center</p>
+          {configMissing && (
+            <div className="mt-4 p-2 bg-red-950/20 border border-red-900 text-[10px] text-red-500 font-bold uppercase">
+              System Error: Configuration Missing in Vercel
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleAuth} className="space-y-4">

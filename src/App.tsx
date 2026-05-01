@@ -51,16 +51,34 @@ export default function App() {
     }
   }, []);
 
-  const activeLog = useMemo(() => getDailyLog(state, new Date()), [state]);
-
   // If Supabase is configured but no session, show Auth
   if (isSupabaseConfigured() && !session) {
     return <Auth onAuth={() => {}} />;
   }
 
-  const pornStreak = useMemo(() => getStreak(state, 'porn'), [state]);
-  const gamblingStreak = useMemo(() => getStreak(state, 'gambling'), [state]);
-  const trainingStreak = useMemo(() => getStreak(state, 'training'), [state]);
+  // Safety check: ensure state exists before calculating metrics
+  const activeLog = useMemo(() => {
+    if (!state) return null;
+    return getDailyLog(state, new Date());
+  }, [state]);
+
+  const pornStreak = useMemo(() => state ? getStreak(state, 'porn') : 0, [state]);
+  const gamblingStreak = useMemo(() => state ? getStreak(state, 'gambling') : 0, [state]);
+  const trainingStreak = useMemo(() => state ? getStreak(state, 'training') : 0, [state]);
+
+  if (!state || !activeLog) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6">
+        <div className="animate-pulse text-zinc-500 font-mono text-[10px] uppercase tracking-[0.2em]">Initializing Life OS...</div>
+        <button 
+          onClick={() => supabase.auth.signOut()}
+          className="text-[9px] text-zinc-800 uppercase font-bold tracking-widest hover:text-zinc-500 transition-colors"
+        >
+          Reset Session
+        </button>
+      </div>
+    );
+  }
 
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 

@@ -11,18 +11,43 @@ export const useAppState = () => {
   // Load from Cloud on startup
   useEffect(() => {
     const syncFromCloud = async () => {
-      if (!isSupabaseConfigured()) return;
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      try {
+        if (!isSupabaseConfigured()) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
 
-      const { data, error } = await supabase
-        .from('user_data')
-        .select('payload')
-        .eq('id', session.user.id)
-        .single();
+        const { data, error } = await supabase
+          .from('user_data')
+          .select('payload')
+          .eq('id', session.user.id)
+          .maybeSingle(); // maybeSingle allows for 0 rows without error
 
-      if (data?.payload) {
-        setState(data.payload);
+        if (error) {
+          console.error("Cloud Load Error:", error);
+          return;
+        }
+
+        if (data?.payload) {
+          setState(prev => {
+            // Start with a fresh initial state, then apply cloud data, then current session
+            const newState = {
+              ...prev,
+              ...data.payload,
+              // Force critical structures to be valid objects/arrays
+              dailyLogs: { ...(prev.dailyLogs || {}), ...(data.payload.dailyLogs || {}) },
+              chores: data.payload.chores || prev.chores || [],
+              skillMetrics: data.payload.skillMetrics || prev.skillMetrics || [],
+              financialLogs: data.payload.financialLogs || prev.financialLogs || [],
+              weeklyReviews: data.payload.weeklyReviews || prev.weeklyReviews || [],
+              identity: data.payload.identity || prev.identity,
+              currentVersion: data.payload.currentVersion || prev.currentVersion,
+              earningFor: data.payload.earningFor || prev.earningFor
+            };
+            return newState;
+          });
+        }
+      } catch (err) {
+        console.error("Critical Sync Error:", err);
       }
     };
     syncFromCloud();
