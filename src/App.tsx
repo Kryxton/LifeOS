@@ -1,0 +1,193 @@
+import { useState, useMemo } from 'react';
+import { useAppState } from './utils/useAppState';
+import { getDailyLog, getStreak } from './utils/storage';
+import { 
+  LayoutDashboard, 
+  ShieldAlert, 
+  Dumbbell, 
+  BookOpen, 
+  Wallet, 
+  ClipboardList, 
+  Settings as SettingsIcon,
+  Flame,
+  Zap,
+  Target,
+  FileText
+} from 'lucide-react';
+import { cn } from './utils/cn';
+
+// Pages
+import Dashboard from './components/Dashboard';
+import Discipline from './components/Discipline';
+import Training from './components/Training';
+import Growth from './components/Growth';
+import Capital from './components/Capital';
+import Reviews from './components/Reviews';
+import Settings from './components/Settings';
+import Contract from './components/Contract';
+import Auth from './components/Auth';
+import { supabase, isSupabaseConfigured } from './utils/supabase';
+import { useEffect } from 'react';
+
+type Page = 'dashboard' | 'discipline' | 'training' | 'growth' | 'capital' | 'reviews' | 'settings' | 'contract';
+
+export default function App() {
+  const [session, setSession] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState<Page>('dashboard');
+  const appProps = useAppState();
+  const { state } = appProps;
+
+  useEffect(() => {
+    if (isSupabaseConfigured()) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session);
+      });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
+      });
+
+      return () => subscription.unsubscribe();
+    }
+  }, []);
+
+  const activeLog = useMemo(() => getDailyLog(state, new Date()), [state]);
+
+  // If Supabase is configured but no session, show Auth
+  if (isSupabaseConfigured() && !session) {
+    return <Auth onAuth={() => {}} />;
+  }
+
+  const pornStreak = useMemo(() => getStreak(state, 'porn'), [state]);
+  const gamblingStreak = useMemo(() => getStreak(state, 'gambling'), [state]);
+  const trainingStreak = useMemo(() => getStreak(state, 'training'), [state]);
+
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+
+  const mainNavItems = [
+    { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
+    { id: 'discipline', label: 'Core', icon: ShieldAlert },
+    { id: 'training', label: 'Body', icon: Dumbbell },
+    { id: 'growth', label: 'Mind', icon: BookOpen },
+  ];
+
+  const secondaryNavItems = [
+    { id: 'capital', label: 'Capital', icon: Wallet },
+    { id: 'reviews', label: 'Reviews', icon: ClipboardList },
+    { id: 'contract', label: 'Contract', icon: FileText },
+    { id: 'settings', label: 'Settings', icon: SettingsIcon },
+  ];
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'dashboard': return <Dashboard {...appProps} log={activeLog} streaks={{ porn: pornStreak, gambling: gamblingStreak, training: trainingStreak }} toggleChore={appProps.toggleChore} setCurrentVersion={appProps.setCurrentVersion} setEarningFor={appProps.setEarningFor} />;
+      case 'discipline': return <Discipline streaks={{ porn: pornStreak, gambling: gamblingStreak }} relapsed={appProps.relapsed} />;
+      case 'training': return <Training state={state} updateTrainingPhase={appProps.updateTrainingPhase} addSkillMetrics={appProps.addSkillMetrics} />;
+      case 'growth': return <Growth {...appProps} log={activeLog} />;
+      case 'capital': return <Capital {...appProps} streaks={{ gambling: gamblingStreak }} />;
+      case 'reviews': return <Reviews {...appProps} />;
+      case 'settings': return <Settings {...appProps} />;
+      case 'contract': return <Contract />;
+      default: return <Dashboard {...appProps} log={activeLog} streaks={{ porn: pornStreak, gambling: gamblingStreak, training: trainingStreak }} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-zinc-800">
+      {/* Top Header */}
+      <header className="fixed top-0 left-0 right-0 h-16 bg-black border-b border-zinc-900 z-50 flex items-center justify-between px-4 lg:px-8">
+        <div className="flex items-center gap-2">
+          <Zap className="w-5 h-5 text-zinc-100" />
+          <h1 className="text-sm font-bold tracking-tighter uppercase">Life OS</h1>
+        </div>
+        <div className="flex gap-4">
+          <div className="flex items-center gap-1.5">
+            <Flame className="w-4 h-4 text-orange-500" />
+            <span className="text-xs font-mono">{pornStreak}d</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Target className="w-4 h-4 text-blue-500" />
+            <span className="text-xs font-mono">{activeLog.score}%</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="pt-20 pb-24 px-4 max-w-2xl mx-auto w-full">
+        {renderPage()}
+      </main>
+
+      {/* More Menu Overlay */}
+      {showMoreMenu && (
+        <div className="fixed inset-0 bg-black/90 z-[60] flex flex-col justify-end p-6 animate-in fade-in duration-200">
+          <div className="space-y-4 mb-12">
+            <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-zinc-600 mb-6">System Access</h3>
+            {secondaryNavItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setCurrentPage(item.id as Page);
+                    setShowMoreMenu(false);
+                  }}
+                  className="w-full flex items-center gap-4 p-4 bg-zinc-950 border border-zinc-900 text-zinc-100"
+                >
+                  <Icon className="w-5 h-5 text-zinc-500" />
+                  <span className="text-sm font-bold uppercase tracking-widest">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          <button 
+            onClick={() => setShowMoreMenu(false)}
+            className="w-full py-4 bg-zinc-100 text-black text-xs font-bold uppercase tracking-widest"
+          >
+            Close Menu
+          </button>
+        </div>
+      )}
+
+      {/* Navigation Bar */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-black border-t border-zinc-900 z-50 px-2">
+        <div className="max-w-2xl mx-auto flex items-center justify-between h-16">
+          {mainNavItems.map((item) => {
+            const Icon = item.icon;
+            const active = currentPage === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setCurrentPage(item.id as Page);
+                  setShowMoreMenu(false);
+                }}
+                className={cn(
+                  "flex-1 flex flex-col items-center justify-center gap-1 transition-colors",
+                  active ? "text-zinc-100" : "text-zinc-500 hover:text-zinc-300"
+                )}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-[9px] uppercase tracking-tighter font-bold">{item.label}</span>
+              </button>
+            );
+          })}
+          
+          <button
+            onClick={() => setShowMoreMenu(!showMoreMenu)}
+            className={cn(
+              "flex-1 flex flex-col items-center justify-center gap-1 transition-colors",
+              showMoreMenu ? "text-zinc-100" : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            <div className="flex gap-0.5">
+              <div className="w-1 h-1 bg-current rounded-full" />
+              <div className="w-1 h-1 bg-current rounded-full" />
+              <div className="w-1 h-1 bg-current rounded-full" />
+            </div>
+            <span className="text-[9px] uppercase tracking-tighter font-bold">More</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  );
+}
