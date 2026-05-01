@@ -34,29 +34,38 @@ type Page = 'dashboard' | 'discipline' | 'training' | 'growth' | 'capital' | 're
 export default function App() {
   const [session, setSession] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const appProps = useAppState();
   const { state } = appProps;
 
   useEffect(() => {
+    let mounted = true;
+    
     if (isSupabaseConfigured()) {
       supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
+        if (mounted) setSession(session);
       });
 
       const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        setSession(session);
+        if (mounted) setSession(session);
       });
 
-      return () => subscription.unsubscribe();
+      return () => {
+        mounted = false;
+        subscription.unsubscribe();
+      };
     }
   }, []);
 
-  // If Supabase is configured but no session, show Auth
-  if (isSupabaseConfigured() && !session) {
-    return <Auth onAuth={() => {}} />;
-  }
+  const streaks = useMemo(() => {
+    if (!state) return { porn: 0, gambling: 0, training: 0 };
+    return {
+      porn: getStreak(state, 'porn'),
+      gambling: getStreak(state, 'gambling'),
+      training: getStreak(state, 'training')
+    };
+  }, [state]);
 
-  // Safety check: ensure state exists before calculating metrics
   const activeLog = useMemo(() => {
     try {
       if (!state) return null;
@@ -67,14 +76,18 @@ export default function App() {
     }
   }, [state]);
 
-  const streaks = useMemo(() => {
-    if (!state) return { porn: 0, gambling: 0, training: 0 };
-    return {
-      porn: getStreak(state, 'porn'),
-      gambling: getStreak(state, 'gambling'),
-      training: getStreak(state, 'training')
-    };
-  }, [state]);
+  // If Supabase is configured but no session, show Auth
+  if (isSupabaseConfigured() && !session) {
+    return <Auth onAuth={() => {}} />;
+  }
+
+  if (!state || !activeLog) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 text-center text-zinc-500">
+        <div className="animate-pulse font-mono text-[10px] uppercase tracking-[0.2em] mb-4">Initializing Life OS...</div>
+      </div>
+    );
+  }
 
   if (!session) {
     return <Auth onAuth={() => {}} />;
@@ -93,8 +106,6 @@ export default function App() {
       </div>
     );
   }
-
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
 
   const mainNavItems = [
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },

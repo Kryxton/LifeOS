@@ -7,6 +7,17 @@
   </head>
   <body class="bg-black">
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div id="error-display" style="color: #666; font-family: monospace; font-size: 10px; padding: 20px; display: none; text-transform: uppercase;"></div>
+    <script>
+      window.onerror = function(msg, url, line) {
+        var el = document.getElementById('error-display');
+        if (el) {
+          el.style.display = 'block';
+          el.innerHTML = 'System Error: ' + msg + ' (' + line + ')';
+        }
+        return false;
+      };
+    </script>
+    <script type="module" src="src/main.tsx"></script>
   </body>
 </html>

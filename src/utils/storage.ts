@@ -62,16 +62,11 @@ export const saveState = (state: AppState) => {
 };
 
 export const getDailyLog = (state: AppState, date: Date): DailyLog => {
-  const dateKey = format(date, 'yyyy-MM-dd');
-  
-  // Safety check: ensure dailyLogs exists
-  if (!state.dailyLogs) {
-    state.dailyLogs = {};
-  }
-  
-  const existing = state.dailyLogs[dateKey];
-  
-  if (existing && existing.tasks && existing.reflection) {
+    const dateKey = format(date, 'yyyy-MM-dd');
+    const dailyLogs = state?.dailyLogs || {};
+    const existing = dailyLogs[dateKey];
+    
+    if (existing && existing.tasks && existing.reflection) {
     // Lock if older than yesterday
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
