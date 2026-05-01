@@ -41,10 +41,10 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
             </div>
           )}
           
-          <div className="mt-2 text-[8px] text-zinc-700 font-mono uppercase text-center space-y-1">
-            <p>Debug Info:</p>
-            <p>URL: {import.meta.env.VITE_SUPABASE_URL ? `${import.meta.env.VITE_SUPABASE_URL.substring(0, 15)}...` : 'NOT FOUND'}</p>
-            <p>KEY: {import.meta.env.VITE_SUPABASE_ANON_KEY ? 'DETECTED (OK)' : 'NOT FOUND'}</p>
+          <div className="mt-2 text-[8px] text-zinc-700 font-mono text-center space-y-1">
+            <p className="uppercase font-bold">System Diagnostics:</p>
+            <p className="break-all">URL: {import.meta.env.VITE_SUPABASE_URL || 'NOT FOUND'}</p>
+            <p className="uppercase">Key: {import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Detected' : 'Missing'}</p>
           </div>
         </div>
 
