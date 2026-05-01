@@ -28,6 +28,7 @@ export const useAppState = () => {
         }
 
         if (data?.payload) {
+<<<<<<< HEAD
           setState(prev => {
             // Start with a fresh initial state, then apply cloud data, then current session
             const newState = {
@@ -44,6 +45,18 @@ export const useAppState = () => {
               earningFor: data.payload.earningFor || prev.earningFor
             };
             return newState;
+=======
+          // Merge or set state with deep defaults to prevent missing properties
+          setState(prev => {
+            const merged = { ...prev, ...data.payload };
+            // Ensure nested objects/arrays exist
+            merged.dailyLogs = merged.dailyLogs || {};
+            merged.chores = merged.chores || prev.chores || [];
+            merged.skillMetrics = merged.skillMetrics || prev.skillMetrics || [];
+            merged.financialLogs = merged.financialLogs || prev.financialLogs || [];
+            merged.weeklyReviews = merged.weeklyReviews || prev.weeklyReviews || [];
+            return merged;
+>>>>>>> 2d703cd56f55d371042338a2694add549d9124b6
           });
         }
       } catch (err) {

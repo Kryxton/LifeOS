@@ -94,3 +94,4 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
     </div>
   );
 }
+
