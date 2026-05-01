@@ -28,11 +28,17 @@ export const useAppState = () => {
         }
 
         if (data?.payload) {
-          // Merge or set state
-          setState(prev => ({
-            ...prev,
-            ...data.payload
-          }));
+          // Merge or set state with deep defaults to prevent missing properties
+          setState(prev => {
+            const merged = { ...prev, ...data.payload };
+            // Ensure nested objects/arrays exist
+            merged.dailyLogs = merged.dailyLogs || {};
+            merged.chores = merged.chores || prev.chores || [];
+            merged.skillMetrics = merged.skillMetrics || prev.skillMetrics || [];
+            merged.financialLogs = merged.financialLogs || prev.financialLogs || [];
+            merged.weeklyReviews = merged.weeklyReviews || prev.weeklyReviews || [];
+            return merged;
+          });
         }
       } catch (err) {
         console.error("Critical Sync Error:", err);
