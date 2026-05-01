@@ -50,9 +50,15 @@ export const saveState = (state: AppState) => {
 
 export const getDailyLog = (state: AppState, date: Date): DailyLog => {
   const dateKey = format(date, 'yyyy-MM-dd');
+  
+  // Safety check: ensure dailyLogs exists
+  if (!state.dailyLogs) {
+    state.dailyLogs = {};
+  }
+  
   const existing = state.dailyLogs[dateKey];
   
-  if (existing) {
+  if (existing && existing.tasks && existing.reflection) {
     // Lock if older than yesterday
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -68,7 +74,7 @@ export const getDailyLog = (state: AppState, date: Date): DailyLog => {
 
   // Create new log for the day
   const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-  const tasks = DEFAULT_TASKS.filter(t => {
+  const tasks = (DEFAULT_TASKS || []).filter(t => {
     if (t.weekdayOnly && isWeekend) return false;
     if (t.weekendOnly && !isWeekend) return false;
     return true;
