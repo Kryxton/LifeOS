@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AppState } from '../types';
-import { Settings as SettingsIcon, Trash2, Plus, RefreshCw, User } from 'lucide-react';
+import { Settings as SettingsIcon, Trash2, Plus, RefreshCw, User, LogOut, Mail } from 'lucide-react';
+import { supabase } from '../utils/supabase';
 
 interface SettingsProps {
   state: AppState;
@@ -9,6 +10,20 @@ interface SettingsProps {
 }
 
 export default function Settings({ state, setIdentity, addChore }: SettingsProps) {
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setUserEmail(user.email || null);
+    });
+  }, []);
+
+  const handleLogout = async () => {
+    if (window.confirm("Logout from system?")) {
+      await supabase.auth.signOut();
+      window.location.reload();
+    }
+  };
   const [newIdentity, setNewIdentity] = useState(state.identity);
   const [newChoreTitle, setNewChoreTitle] = useState('');
 
@@ -31,6 +46,26 @@ export default function Settings({ state, setIdentity, addChore }: SettingsProps
         <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">System Configuration</h2>
         <p className="text-xl font-bold tracking-tight uppercase">Settings</p>
       </header>
+
+      {/* Account Info */}
+      <section className="bg-zinc-950 border border-zinc-900 p-6 space-y-6">
+        <div className="flex items-center gap-3 border-b border-zinc-900 pb-3">
+          <Mail className="w-5 h-5 text-zinc-500" />
+          <h3 className="text-[10px] uppercase font-bold text-zinc-100 tracking-[0.2em]">Account</h3>
+        </div>
+        <div className="flex flex-col gap-4">
+          <div className="space-y-1">
+            <label className="text-[9px] uppercase font-bold text-zinc-600">Active Session</label>
+            <div className="text-sm font-mono text-zinc-300">{userEmail || 'Loading...'}</div>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 bg-zinc-900 border border-zinc-800 text-zinc-400 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-red-950/20 hover:text-red-500 transition-colors"
+          >
+            <LogOut className="w-3 h-3" /> Terminate Session
+          </button>
+        </div>
+      </section>
 
       {/* Identity Configuration */}
       <section className="bg-zinc-950 border border-zinc-900 p-6 space-y-6">

@@ -8,8 +8,18 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
 
+  const [attempts, setAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (lockoutUntil && Date.now() < lockoutUntil) {
+      const remaining = Math.ceil((lockoutUntil - Date.now()) / 1000);
+      alert(`System locked. Try again in ${remaining} seconds.`);
+      return;
+    }
+
     setLoading(true);
 
     const { error } = isSignUp 
@@ -17,11 +27,35 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
       : await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      alert(error.message);
+      const newAttempts = attempts + 1;
+      setAttempts(newAttempts);
+      
+      if (newAttempts >= 3) {
+        // Exponential backoff: 30s, 60s, 120s...
+        const backoff = Math.pow(2, newAttempts - 3) * 30 * 1000;
+        setLockoutUntil(Date.now() + backoff);
+        alert(`Too many attempts. System locked for ${backoff / 1000} seconds.`);
+      } else {
+        alert(error.message);
+      }
     } else {
+      setAttempts(0);
+      setLockoutUntil(null);
       onAuth();
     }
     setLoading(false);
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      alert("Enter your email first.");
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    });
+    if (error) alert(error.message);
+    else alert("Password reset link sent to your email.");
   };
 
   const configMissing = !import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -78,13 +112,23 @@ export default function Auth({ onAuth }: { onAuth: () => void }) {
           </button>
         </form>
 
-        <div className="text-center">
+        <div className="text-center flex flex-col gap-4">
           <button 
+            type="button"
             onClick={() => setIsSignUp(!isSignUp)}
             className="text-[9px] uppercase font-bold text-zinc-600 tracking-widest hover:text-zinc-400"
           >
             {isSignUp ? 'Already have access? Log in' : 'First time? Request enrollment'}
           </button>
+          {!isSignUp && (
+            <button 
+              type="button"
+              onClick={handleResetPassword}
+              className="text-[9px] uppercase font-bold text-zinc-700 tracking-widest hover:text-zinc-500"
+            >
+              Forgot Password?
+            </button>
+          )}
         </div>
 
         <div className="pt-8 text-center opacity-20">
