@@ -101,21 +101,35 @@ export default function Dashboard({
             <span className="text-[9px] uppercase font-bold text-zinc-600 block mb-2">Focus</span>
             <p className="text-sm italic">"{selectedDateLog.focus || 'No focus set'}"</p>
           </div>
-          <div className="space-y-2">
+          
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-zinc-950 border border-zinc-900 p-3">
+              <span className="text-[8px] uppercase font-bold text-zinc-600 block">Screen Time</span>
+              <p className="text-sm font-mono">{selectedDateLog.screenTime || 0}h</p>
+            </div>
+            <div className="bg-zinc-950 border border-zinc-900 p-3">
+              <span className="text-[8px] uppercase font-bold text-zinc-600 block">Netflix</span>
+              <p className="text-sm font-mono">{selectedDateLog.netflixHours || 0}h</p>
+            </div>
+          </div>
+
+          <div className="space-y-1">
             {selectedDateLog.tasks.map(t => (
               <div key={t.id} className={cn(
                 "flex justify-between p-3 border text-xs",
                 t.completed ? "bg-zinc-100 text-black border-zinc-100" : "bg-black text-zinc-600 border-zinc-900"
               )}>
-                <span>{t.label}</span>
-                <span>{t.completed ? 'COMPLETED' : 'FAILED'}</span>
+                <span className="font-medium">{t.label}</span>
+                <span className="font-mono text-[10px]">{t.completed ? 'DONE' : 'MISS'}</span>
               </div>
             ))}
           </div>
+
           <div className="bg-zinc-950 border border-zinc-900 p-4 space-y-4">
             <span className="text-[9px] uppercase font-bold text-zinc-600 block">Reflection</span>
-            <p className="text-xs leading-relaxed"><span className="text-zinc-500">Good:</span> {selectedDateLog.reflection.well}</p>
-            <p className="text-xs leading-relaxed"><span className="text-zinc-500">Escape:</span> {selectedDateLog.reflection.escape}</p>
+            <p className="text-xs leading-relaxed"><span className="text-zinc-500 underline decoration-zinc-800 underline-offset-4 mr-2">Strengths:</span> {selectedDateLog.reflection.well}</p>
+            <p className="text-xs leading-relaxed"><span className="text-zinc-500 underline decoration-zinc-800 underline-offset-4 mr-2">Escapes:</span> {selectedDateLog.reflection.escape}</p>
+            <p className="text-xs leading-relaxed"><span className="text-zinc-500 underline decoration-zinc-800 underline-offset-4 mr-2">Improve:</span> {selectedDateLog.reflection.improvement}</p>
           </div>
         </div>
       </div>

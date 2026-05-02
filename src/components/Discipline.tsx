@@ -1,4 +1,4 @@
-import { ShieldAlert, Flame, Ban, TrendingDown } from 'lucide-react';
+import { ShieldAlert, Ban } from 'lucide-react';
 
 interface DisciplineProps {
   streaks: { porn: number; gambling: number };
@@ -32,8 +32,8 @@ export default function Discipline({ streaks, relapsed }: DisciplineProps) {
       {/* Porn Section */}
       <section className="bg-zinc-950 border border-zinc-900 p-6 space-y-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Flame className="w-6 h-6 text-orange-600" />
+          <div className="flex items-center gap-3 text-zinc-100">
+            <ShieldAlert className="w-6 h-6 text-zinc-500" />
             <h3 className="text-lg font-bold uppercase tracking-tight">Pornography</h3>
           </div>
           <div className="text-right">
@@ -43,8 +43,8 @@ export default function Discipline({ streaks, relapsed }: DisciplineProps) {
         </div>
         
         <div className="bg-black border border-zinc-900 p-4">
-          <p className="text-xs text-zinc-500 leading-relaxed italic">
-            "Pornography is a parasite that consumes your drive, your confidence, and your soul. Every second spent there is a second lost in real life."
+          <p className="text-xs text-zinc-500 leading-relaxed italic text-center">
+            "Pornography is a parasite that consumes your drive, your confidence, and your soul."
           </p>
         </div>
 
@@ -63,8 +63,8 @@ export default function Discipline({ streaks, relapsed }: DisciplineProps) {
       {/* Gambling Section */}
       <section className="bg-zinc-950 border border-zinc-900 p-6 space-y-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <TrendingDown className="w-6 h-6 text-blue-600" />
+          <div className="flex items-center gap-3 text-zinc-100">
+            <Ban className="w-6 h-6 text-zinc-500" />
             <h3 className="text-lg font-bold uppercase tracking-tight">Gambling</h3>
           </div>
           <div className="text-right">
@@ -82,10 +82,10 @@ export default function Discipline({ streaks, relapsed }: DisciplineProps) {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 bg-blue-950/10 border border-blue-900/30 p-4">
-            <ShieldAlert className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
+          <div className="flex items-start gap-3 bg-zinc-900/50 border border-zinc-800 p-4">
+            <ShieldAlert className="w-4 h-4 text-zinc-500 mt-0.5 shrink-0" />
             <div className="space-y-1">
-              <p className="text-xs font-bold text-blue-500 uppercase tracking-wider">Monthly Investment Rule</p>
+              <p className="text-xs font-bold text-zinc-100 uppercase tracking-wider">Monthly Investment Rule</p>
               <p className="text-[10px] text-zinc-500">80€ max Solana long-term deposit. No trading. No leverage.</p>
             </div>
           </div>
