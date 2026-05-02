@@ -75,6 +75,14 @@ export const getDailyLog = (state: AppState, date: Date): DailyLog => {
     const existing = dailyLogs[dateKey];
     
     if (existing && existing.tasks && existing.reflection) {
+    // Update existing day with new master tasks if they are missing
+    const currentTaskIds = new Set(existing.tasks.map(t => t.id));
+    const missingTasks = DEFAULT_TASKS.filter(t => !currentTaskIds.has(t.id));
+    
+    if (missingTasks.length > 0 && !existing.locked) {
+      existing.tasks = [...existing.tasks, ...missingTasks.map(t => ({ ...t }))];
+    }
+
     // Lock if older than yesterday
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
