@@ -12,12 +12,24 @@ interface CapitalProps {
 export default function Capital({ state, streaks, addFinancialLog }: CapitalProps) {
   const totals = useMemo(() => {
     const logs = state.financialLogs || [];
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
     return logs.reduce((acc, log) => {
+      const logDate = new Date(log.date);
       if (log.type === 'SAVINGS') acc.saved += log.amount;
-      if (log.type === 'INVESTMENT') acc.invested += log.amount;
+      if (log.type === 'INVESTMENT') {
+        acc.invested += log.amount;
+        if (logDate.getMonth() === currentMonth && logDate.getFullYear() === currentYear) {
+          acc.monthlyInvestment += log.amount;
+        }
+      }
       return acc;
-    }, { saved: 0, invested: 0 });
+    }, { saved: 0, invested: 0, monthlyInvestment: 0 });
   }, [state.financialLogs]);
+
+  const investmentProgress = Math.min(100, (totals.monthlyInvestment / 80) * 100);
 
   const handleAdd = (type: 'SAVINGS' | 'INVESTMENT') => {
     const amount = window.prompt(`Enter ${type.toLowerCase()} amount:`);
@@ -80,7 +92,7 @@ export default function Capital({ state, streaks, addFinancialLog }: CapitalProp
 
       <section className="bg-zinc-950 border border-zinc-900 p-6 space-y-4">
         <div className="flex items-center gap-3 border-b border-zinc-900 pb-3">
-          <ShieldCheck className="w-5 h-5 text-blue-500" />
+          <ShieldCheck className="w-5 h-5 text-zinc-100" />
           <h3 className="text-[10px] uppercase font-bold text-zinc-100 tracking-[0.2em]">Investment Standards</h3>
         </div>
         <div className="space-y-3">
@@ -92,12 +104,15 @@ export default function Capital({ state, streaks, addFinancialLog }: CapitalProp
             - No leverage. No trading. No memecoins.
           </p>
           <div className="pt-2">
-            <div className="w-full bg-zinc-900 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-blue-600 h-full w-[62%]" />
+            <div className="w-full bg-zinc-900 h-1.5 rounded-none overflow-hidden">
+              <div 
+                className="bg-zinc-100 h-full transition-all duration-500" 
+                style={{ width: `${investmentProgress}%` }}
+              />
             </div>
             <div className="flex justify-between mt-2">
-              <span className="text-[9px] uppercase font-bold text-zinc-600">Goal Progress</span>
-              <span className="text-[9px] font-mono text-zinc-500">Min. €50</span>
+              <span className="text-[9px] uppercase font-bold text-zinc-600">This Month</span>
+              <span className="text-[9px] font-mono text-zinc-500">€{totals.monthlyInvestment} / €80</span>
             </div>
           </div>
         </div>

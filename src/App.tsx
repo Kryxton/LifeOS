@@ -11,7 +11,6 @@ import {
   Settings as SettingsIcon,
   Flame,
   Zap,
-  Target,
   FileText
 } from 'lucide-react';
 import { cn } from './utils/cn';
@@ -146,11 +145,10 @@ export default function App() {
         </div>
         <div className="flex gap-4">
           <div className="flex items-center gap-1.5">
-            <Flame className="w-4 h-4 text-orange-500" />
+            <Flame className="w-4 h-4 text-red-500" />
             <span className="text-xs font-mono">{streaks.porn}d</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <Target className="w-4 h-4 text-blue-500" />
+          <div className="flex items-center gap-1.5 border border-zinc-900 px-2 py-0.5">
             <span className="text-xs font-mono">{activeLog.score}%</span>
           </div>
         </div>

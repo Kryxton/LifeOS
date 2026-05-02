@@ -8,8 +8,11 @@ export const DEFAULT_TASKS: DisciplineTask[] = [
   { id: 'g1', label: 'No Gambling', weight: 3, category: 'DISCIPLINE', completed: false },
   { id: 'ph1', label: 'No Phone Before Learning', weight: 2, category: 'DISCIPLINE', completed: false },
   { id: 'nf1', label: 'No Netflix (Weekday)', weight: 2, category: 'DISCIPLINE', completed: false, weekdayOnly: true },
+  { id: 'al1', label: 'No Alcohol', weight: 1, category: 'DISCIPLINE', completed: false },
+  { id: 'sm1', label: 'No Smoking', weight: 1, category: 'DISCIPLINE', completed: false },
   { id: 'hw1', label: 'Homework / Learning', weight: 2, category: 'GROWTH', completed: false },
   { id: 'sb1', label: 'Serbian Practice', weight: 1, category: 'GROWTH', completed: false },
+  { id: 'bc1', label: '15min Ball Control', weight: 1, category: 'BODY', completed: false },
   { id: 'tr1', label: 'Training Done', weight: 2, category: 'BODY', completed: false },
   { id: 'sk1', label: 'Skin Routine', weight: 1, category: 'BODY', completed: false },
   { id: 'ps1', label: 'Posture Routine', weight: 1, category: 'BODY', completed: false },
@@ -139,34 +142,46 @@ export const calculateScore = (log: DailyLog): number => {
 export const getStreak = (state: AppState, type: 'porn' | 'gambling' | 'training'): number => {
   if (!state) return 0;
 
-  if (type === 'porn') {
-    if (!state.lastPornRelapse) return 0;
-    try {
-      const diff = new Date().getTime() - new Date(state.lastPornRelapse).getTime();
-      return Math.floor(diff / (1000 * 60 * 60 * 24));
-    } catch (e) { return 0; }
-  }
-  if (type === 'gambling') {
-    if (!state.lastGamblingRelapse) return 0;
-    try {
-      const diff = new Date().getTime() - new Date(state.lastGamblingRelapse).getTime();
-      return Math.floor(diff / (1000 * 60 * 60 * 24));
-    } catch (e) { return 0; }
+  const dailyLogs = state.dailyLogs || {};
+  const sortedDates = Object.keys(dailyLogs).sort().reverse();
+  const todayKey = format(new Date(), 'yyyy-MM-dd');
+
+  if (type === 'porn' || type === 'gambling') {
+    let streak = 0;
+    const taskLabel = type === 'porn' ? 'No Porn' : 'No Gambling';
+    
+    // Check if there was a manual relapse today
+    const todayLog = dailyLogs[todayKey];
+    if (todayLog?.isUrgeFailed) return 0;
+
+    for (const dateKey of sortedDates) {
+      const log = dailyLogs[dateKey];
+      const task = log?.tasks?.find(t => t.label === taskLabel);
+      
+      if (task?.completed) {
+        streak++;
+      } else if (dateKey === todayKey) {
+        // If today is not completed yet, keep the streak from yesterday
+        continue;
+      } else {
+        // Break at the first failure
+        break;
+      }
+    }
+    
+    return streak;
   }
   
   // Training streak logic
   let streak = 0;
-  const dailyLogs = state.dailyLogs || {};
-  const dates = Object.keys(dailyLogs).sort().reverse();
-  
-  for (const dateKey of dates) {
+  for (const dateKey of sortedDates) {
     const log = dailyLogs[dateKey];
     if (!log || !log.tasks) continue;
     
     const trainingDone = log.tasks.find(t => t.label === 'Training Done')?.completed;
     if (trainingDone) {
       streak++;
-    } else if (dateKey !== format(new Date(), 'yyyy-MM-dd')) {
+    } else if (dateKey !== todayKey) {
       break;
     }
   }
