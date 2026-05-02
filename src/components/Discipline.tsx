@@ -6,12 +6,28 @@ interface DisciplineProps {
 }
 
 export default function Discipline({ streaks, relapsed }: DisciplineProps) {
+  const combinedStreak = Math.min(streaks.porn, streaks.gambling);
+
   return (
     <div className="space-y-12">
       <header className="space-y-2">
         <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Addiction Control</h2>
         <p className="text-xl font-bold tracking-tight uppercase">Discipline {'>'} Dopamine</p>
       </header>
+
+      {/* Overview */}
+      <section className="grid grid-cols-1 gap-4">
+        <div className="bg-zinc-100 p-6 text-black flex justify-between items-center">
+          <div>
+            <p className="text-[10px] uppercase font-black tracking-widest opacity-60">Total Discipline Score</p>
+            <h3 className="text-3xl font-black uppercase italic">Mastery</h3>
+          </div>
+          <div className="text-right">
+            <div className="text-4xl font-mono font-black tracking-tighter">{combinedStreak}d</div>
+            <p className="text-[9px] uppercase font-bold">Absolute Clean Streak</p>
+          </div>
+        </div>
+      </section>
 
       {/* Porn Section */}
       <section className="bg-zinc-950 border border-zinc-900 p-6 space-y-6">

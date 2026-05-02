@@ -6,6 +6,7 @@ import { supabase, isSupabaseConfigured } from './supabase';
 
 export const useAppState = () => {
   const [state, setState] = useState<AppState>(loadState);
+  const [isCloudLoaded, setIsCloudLoaded] = useState(false);
 
   // Load from Cloud (ONLY ONCE ON LOGIN)
   useEffect(() => {
@@ -26,16 +27,25 @@ export const useAppState = () => {
 
         if (data && data.length > 0 && data[0].payload && mounted) {
           const cloud = data[0].payload;
-          setState(current => ({
-            ...current,
-            ...cloud,
-            dailyLogs: { ...(current?.dailyLogs || {}), ...(cloud.dailyLogs || {}) },
-            chores: cloud.chores || current?.chores || [],
-            skillMetrics: cloud.skillMetrics || current?.skillMetrics || [],
-          }));
+          setState(current => {
+            const newState = {
+              ...current,
+              ...cloud,
+              dailyLogs: { ...(current?.dailyLogs || {}), ...(cloud.dailyLogs || {}) },
+              chores: cloud.chores || current?.chores || [],
+              skillMetrics: cloud.skillMetrics || current?.skillMetrics || [],
+              financialLogs: cloud.financialLogs || current?.financialLogs || [],
+              weeklyReviews: cloud.weeklyReviews || current?.weeklyReviews || [],
+            };
+            return newState;
+          });
+          setIsCloudLoaded(true);
+        } else {
+          setIsCloudLoaded(true); // Mark loaded even if no cloud data exists yet
         }
       } catch (e) {
         console.error("Sync failed", e);
+        setIsCloudLoaded(true); // Don't block saving if sync fails once
       }
     };
 
@@ -45,7 +55,7 @@ export const useAppState = () => {
 
   // Save changes
   useEffect(() => {
-    if (!state) return;
+    if (!state || !isCloudLoaded) return; // CRITICAL: Don't save until we've at least tried to load
     saveState(state);
 
     const timer = setTimeout(async () => {
@@ -60,7 +70,7 @@ export const useAppState = () => {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [state]);
+  }, [state, isCloudLoaded]);
 
   const updateDailyLog = useCallback((date: Date, updater: (log: DailyLog) => DailyLog) => {
     const dateKey = format(date, 'yyyy-MM-dd');
@@ -168,6 +178,7 @@ export const useAppState = () => {
 
   return {
     state,
+    isCloudLoaded,
     updateDailyLog,
     setIdentity,
     relapsed,

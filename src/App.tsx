@@ -36,7 +36,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const appProps = useAppState();
-  const { state } = appProps;
+  const { state, isCloudLoaded } = appProps;
 
   useEffect(() => {
     let mounted = true;
@@ -81,10 +81,11 @@ export default function App() {
     return <Auth onAuth={() => {}} />;
   }
 
-  if (!state || !activeLog) {
+  if (!state || !activeLog || !isCloudLoaded) {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 text-center text-zinc-500">
-        <div className="animate-pulse font-mono text-[10px] uppercase tracking-[0.2em] mb-4">Initializing Life OS...</div>
+        <div className="animate-pulse font-mono text-[10px] uppercase tracking-[0.2em] mb-4 text-zinc-100">Synchronizing with Cloud...</div>
+        <p className="text-[8px] uppercase tracking-widest opacity-30 mt-4">Establishing Secure Connection</p>
       </div>
     );
   }
