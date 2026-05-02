@@ -131,7 +131,7 @@ export default function App() {
       case 'capital': return <Capital {...appProps} streaks={streaks} />;
       case 'reviews': return <Reviews {...appProps} />;
       case 'settings': return <Settings {...appProps} />;
-      case 'contract': return <Contract />;
+      case 'contract': return <Contract state={state} updateContract={appProps.updateContract} />;
       default: return <Dashboard {...appProps} log={activeLog} streaks={streaks} />;
     }
   };

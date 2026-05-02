@@ -32,6 +32,11 @@ const INITIAL_STATE: AppState = {
   skillMetrics: [],
   currentVersion: 'Focused',
   earningFor: '',
+  contract: {
+    name: '',
+    date: '',
+    signature: '',
+  },
 };
 
 export const loadState = (): AppState => {

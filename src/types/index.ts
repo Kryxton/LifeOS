@@ -92,4 +92,9 @@ export type AppState = {
   skillMetrics: SkillMetricEntry[];
   currentVersion: string;
   earningFor: string;
+  contract: {
+    name: string;
+    date: string;
+    signature: string;
+  };
 };

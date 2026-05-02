@@ -36,16 +36,17 @@ export const useAppState = () => {
               skillMetrics: cloud.skillMetrics || current?.skillMetrics || [],
               financialLogs: cloud.financialLogs || current?.financialLogs || [],
               weeklyReviews: cloud.weeklyReviews || current?.weeklyReviews || [],
+              contract: cloud.contract || current?.contract || { name: '', date: '', signature: '' }
             };
             return newState;
           });
           setIsCloudLoaded(true);
         } else {
-          setIsCloudLoaded(true); // Mark loaded even if no cloud data exists yet
+          setIsCloudLoaded(true); 
         }
       } catch (e) {
         console.error("Sync failed", e);
-        setIsCloudLoaded(true); // Don't block saving if sync fails once
+        setIsCloudLoaded(true); 
       }
     };
 
@@ -55,7 +56,7 @@ export const useAppState = () => {
 
   // Save changes
   useEffect(() => {
-    if (!state || !isCloudLoaded) return; // CRITICAL: Don't save until we've at least tried to load
+    if (!state || !isCloudLoaded) return; 
     saveState(state);
 
     const timer = setTimeout(async () => {
@@ -67,7 +68,7 @@ export const useAppState = () => {
         payload: state,
         updated_at: new Date().toISOString()
       }, { onConflict: 'id' });
-    }, 2000);
+    }, 1000); // Shorter debounce for better feel
 
     return () => clearTimeout(timer);
   }, [state, isCloudLoaded]);
@@ -176,6 +177,13 @@ export const useAppState = () => {
     setState(prev => ({ ...prev, earningFor: value }));
   };
 
+  const updateContract = (fields: Partial<AppState['contract']>) => {
+    setState(prev => ({
+      ...prev,
+      contract: { ...prev.contract, ...fields }
+    }));
+  };
+
   return {
     state,
     isCloudLoaded,
@@ -189,6 +197,7 @@ export const useAppState = () => {
     addWeeklyReview,
     addSkillMetrics,
     setCurrentVersion,
-    setEarningFor
+    setEarningFor,
+    updateContract
   };
 };

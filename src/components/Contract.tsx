@@ -1,16 +1,13 @@
 import { FileText } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { AppState } from '../types';
 
-export default function Contract() {
-  const [name, setName] = useState(() => localStorage.getItem('contract_name') || '');
-  const [date, setDate] = useState(() => localStorage.getItem('contract_date') || '');
-  const [signature, setSignature] = useState(() => localStorage.getItem('contract_signature') || '');
+interface ContractProps {
+  state: AppState;
+  updateContract: (fields: Partial<AppState['contract']>) => void;
+}
 
-  useEffect(() => {
-    localStorage.setItem('contract_name', name);
-    localStorage.setItem('contract_date', date);
-    localStorage.setItem('contract_signature', signature);
-  }, [name, date, signature]);
+export default function Contract({ state, updateContract }: ContractProps) {
+  const { contract } = state;
 
   return (
     <div className="space-y-12 pb-20 max-w-xl mx-auto text-zinc-300">
@@ -28,8 +25,8 @@ export default function Contract() {
           <label className="text-[10px] uppercase font-bold text-zinc-600 tracking-widest">Name</label>
           <input 
             type="text" 
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={contract.name}
+            onChange={(e) => updateContract({ name: e.target.value })}
             className="bg-transparent border-b border-zinc-800 py-1 focus:outline-none focus:border-zinc-100 transition-colors text-zinc-100"
             placeholder="Enter full name"
           />
@@ -38,8 +35,8 @@ export default function Contract() {
           <label className="text-[10px] uppercase font-bold text-zinc-600 tracking-widest">Date</label>
           <input 
             type="text" 
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+            value={contract.date}
+            onChange={(e) => updateContract({ date: e.target.value })}
             className="bg-transparent border-b border-zinc-800 py-1 focus:outline-none focus:border-zinc-100 transition-colors text-zinc-100"
             placeholder="Enter date"
           />
@@ -177,8 +174,8 @@ export default function Contract() {
             <label className="text-[10px] uppercase font-bold text-zinc-600 tracking-widest">Signed</label>
             <input 
               type="text" 
-              value={signature}
-              onChange={(e) => setSignature(e.target.value)}
+              value={contract.signature}
+              onChange={(e) => updateContract({ signature: e.target.value })}
               className="w-full bg-transparent border-b border-zinc-800 py-4 focus:outline-none focus:border-zinc-100 font-serif italic text-2xl"
               placeholder="Your Signature"
             />
@@ -186,7 +183,7 @@ export default function Contract() {
           </div>
           <div className="space-y-2 flex flex-col justify-end">
             <div className="border-b border-zinc-800 py-4 text-zinc-100 text-sm">
-              {date || "_______________________"}
+              {contract.date || "_______________________"}
             </div>
             <label className="text-[10px] uppercase font-bold text-zinc-600 tracking-widest">Date</label>
           </div>
