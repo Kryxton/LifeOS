@@ -9,7 +9,6 @@ import {
   Wallet, 
   ClipboardList, 
   Settings as SettingsIcon,
-  Flame,
   Zap,
   FileText
 } from 'lucide-react';
@@ -24,11 +23,12 @@ import Capital from './components/Capital';
 import Reviews from './components/Reviews';
 import Settings from './components/Settings';
 import Contract from './components/Contract';
+import Looks from './components/Looks';
 import Auth from './components/Auth';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
 import { useEffect } from 'react';
 
-type Page = 'dashboard' | 'discipline' | 'training' | 'growth' | 'capital' | 'reviews' | 'settings' | 'contract';
+type Page = 'dashboard' | 'discipline' | 'training' | 'growth' | 'capital' | 'reviews' | 'settings' | 'contract' | 'looks';
 
 export default function App() {
   const [session, setSession] = useState<any>(null);
@@ -111,6 +111,7 @@ export default function App() {
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
     { id: 'discipline', label: 'Core', icon: ShieldAlert },
     { id: 'training', label: 'Body', icon: Dumbbell },
+    { id: 'looks', label: 'Looks', icon: Zap },
     { id: 'growth', label: 'Mind', icon: BookOpen },
   ];
 
@@ -131,6 +132,7 @@ export default function App() {
       case 'reviews': return <Reviews {...appProps} />;
       case 'settings': return <Settings {...appProps} />;
       case 'contract': return <Contract state={state} updateContract={appProps.updateContract} />;
+      case 'looks': return <Looks />;
       default: return <Dashboard {...appProps} log={activeLog} streaks={streaks} />;
     }
   };
