@@ -15,7 +15,7 @@ export const DEFAULT_TASKS: DisciplineTask[] = [
   { id: 'bc1', label: '15min Ball Control', weight: 1, category: 'BODY', completed: false },
   { id: 'tr1', label: 'Training Done', weight: 2, category: 'BODY', completed: false },
   { id: 'sk1', label: 'Skin Routine', weight: 1, category: 'BODY', completed: false },
-  { id: 'ps1', label: 'Posture Routine', weight: 1, category: 'BODY', completed: false },
+  { id: 'ps1', label: 'Looks Routine', weight: 2, category: 'BODY', completed: false },
   { id: 'w1', label: '3L Water', weight: 1, category: 'BODY', completed: false },
   { id: 'sl1', label: '8h Sleep', weight: 1, category: 'BODY', completed: false },
 ];

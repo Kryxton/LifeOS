@@ -3,120 +3,121 @@ import { Clock, Zap, CheckCircle2 } from 'lucide-react';
 export default function Looks() {
   const sections = [
     {
-      title: "MORGENS (beim Aufwachen) – ~5 Min",
+      title: "MORNING (Upon Waking) – ~5 Min",
       items: [
         {
-          label: "LYMPHDRAINAGE (2 Min)",
+          label: "LYMPHATIC DRAINAGE (2 Min)",
           details: [
-            "Flache Hand, sanfte Striche von Mitte des Gesichts nach außen Richtung Ohr",
-            "Dann sanft den Hals runter",
-            "Ringfinger unter Augen von innen nach außen",
-            "Immer mit Moisturizer/Öl"
+            "Flat hand, gentle strokes from center of face outward towards ears",
+            "Then gently down the neck",
+            "Ring finger under eyes from inside to outside",
+            "Always use with moisturizer/oil"
           ]
         },
         {
           label: "JAWLINE MASSAGE (2 Min)",
           details: [
-            "Knöchel entlang Kiefer nach oben ziehen",
-            "Masseter (vor dem Ohr) kreisend massieren",
-            "Fester aber nicht schmerzhafter Druck"
+            "Pull knuckles along jawline upwards",
+            "Massage masseter (in front of ear) in circles",
+            "Firm but not painful pressure"
           ]
         },
         {
-          label: "WANGEN MASSAGE (1 Min)",
+          label: "CHEEK MASSAGE (1 Min)",
           details: [
-            "Handballen flach auf Wange",
-            "Kreisende Bewegungen nach oben außen",
-            "Nie nach unten ziehen"
+            "Heel of hand flat on cheek",
+            "Circular movements upward and outward",
+            "Never pull downwards"
           ]
         }
       ]
     },
     {
-      title: "TÄGLICH (morgens oder abends) – ~15 Min",
+      title: "DAILY (Morning or Evening) – ~15 Min",
       items: [
         {
           label: "CHIN TUCKS",
           details: [
-            "Kinn gerade nach hinten schieben (kein Nicken, nur zurück)",
-            "Doppelkinn entsteht kurz – das ist richtig",
-            "3x10 Wiederholungen, 2 Sek halten"
+            "Push chin straight back (no nodding, just back)",
+            "A double chin will form briefly – this is correct",
+            "3x10 repetitions, hold for 2 sec"
           ]
         },
         {
-          label: "NECK CURL (liegend)",
+          label: "NECK CURL (Lying)",
           details: [
-            "Flach hinlegen",
-            "Nur mit Nackenmuskel Kinn zur Brust heben",
-            "Kein Schwung",
-            "3x15 Wiederholungen"
+            "Lie flat",
+            "Lift chin to chest using only neck muscles",
+            "No momentum",
+            "3x15 repetitions"
           ]
         },
         {
           label: "NECK EXTENSION",
           details: [
-            "Kopf langsam nach hinten",
-            "Hand gibt leichten Gegendruck",
-            "3x10, je 10 Sek halten"
+            "Slowly move head backward",
+            "Hand provides light counter-pressure",
+            "3x10, hold for 10 sec each"
           ]
         },
         {
-          label: "ISOMETRISCHER WIDERSTAND (4 Richtungen)",
+          label: "ISOMETRIC RESISTANCE (4 Directions)",
           details: [
-            "Hand gegen Stirn/Hinterkopf/Schläfen – dagegen drücken",
-            "Nicht bewegen, nur Spannung",
-            "Je 10 Sek halten, 3x pro Richtung"
+            "Hand against forehead/back of head/temples – press against it",
+            "Do not move, only tension",
+            "Hold for 10 sec, 3x per direction"
           ]
         },
         {
-          label: "KINN-STRECK ÜBUNG",
+          label: "CHIN-STRETCH EXERCISE",
           details: [
-            "Kinn nach oben strecken",
-            "Unterlippe über Oberlippe schieben",
-            "10x, je 10 Sek halten"
+            "Stretch chin upwards",
+            "Slide lower lip over upper lip",
+            "10x, hold for 10 sec each"
           ]
         },
         {
-          label: "WANGENKNOCHEN WIDERSTAND",
+          label: "CHEEKBONE RESISTANCE",
           details: [
-            "Breit lächeln",
-            "Finger leicht auf Wangen, Widerstand geben",
-            "3x30 Sek"
+            "Wide smile",
+            "Fingers lightly on cheeks, provide resistance",
+            "3x30 sec"
           ]
         },
         {
-          label: "BROWBONE WIDERSTAND",
+          label: "BROWBONE RESISTANCE",
           details: [
-            "Augenbrauen mit Fingern runterdrücken",
-            "Dagegen hochziehen",
-            "3x10 Sek halten"
+            "Press eyebrows down with fingers",
+            "Pull them up against the resistance",
+            "3x10 sec hold"
           ]
         }
       ]
     },
     {
-      title: "GANZEN TAG – 0 Min extra",
+      title: "ALL DAY – 0 Min extra",
       items: [
         {
-          label: "MEWING (immer, überall)",
+          label: "MEWING (Always, everywhere)",
           details: [
-            "Gesamte Zunge flach an Gaumen pressen",
-            "Mund geschlossen, Zähne leicht berühren",
-            "Wird zur Gewohnheit nach 2-3 Wochen"
+            "Press entire tongue flat against roof of mouth",
+            "The back part of the tongue must be up too",
+            "Mouth closed, teeth touching lightly",
+            "Becomes habit after 2-3 weeks"
           ]
         },
         {
-          label: "MASTIC GUM KAUEN",
+          label: "MASTIC GUM CHEWING",
           details: [
-            "20-30 Min täglich",
-            "Beide Seiten gleichmäßig kauen"
+            "20-30 min daily",
+            "Chew both sides evenly"
           ]
         },
         {
-          label: "HALTUNG",
+          label: "POSTURE",
           details: [
-            "Schultern zurück",
-            "Ohren über Schultern, Kopf gerade"
+            "Shoulders back",
+            "Ears over shoulders, head straight"
           ]
         }
       ]
@@ -127,7 +128,7 @@ export default function Looks() {
     <div className="space-y-12 pb-20">
       <header className="space-y-1">
         <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Physical Appearance</h2>
-        <p className="text-xl font-bold tracking-tight uppercase underline decoration-zinc-800 underline-offset-8">Gesicht & Nacken Plan</p>
+        <p className="text-xl font-bold tracking-tight uppercase underline decoration-zinc-800 underline-offset-8">Face & Neck Plan</p>
       </header>
 
       {/* Summary Stats */}
@@ -135,7 +136,7 @@ export default function Looks() {
         <div className="bg-zinc-950 border border-zinc-900 p-4 space-y-1">
           <div className="flex items-center gap-2 text-zinc-600">
             <Clock className="w-3 h-3" />
-            <span className="text-[9px] uppercase font-bold tracking-widest">Täglicher Aufwand</span>
+            <span className="text-[9px] uppercase font-bold tracking-widest">Daily Effort</span>
           </div>
           <div className="text-xl font-mono font-bold">~30 MIN</div>
         </div>
