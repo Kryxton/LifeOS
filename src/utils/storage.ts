@@ -78,6 +78,17 @@ export const getDailyLog = (state: AppState, date: Date): DailyLog => {
     if (existing && existing.tasks && existing.reflection) {
     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
     
+    // Force update labels/weights for existing tasks if they've changed in the master list
+    if (!existing.locked) {
+      existing.tasks = existing.tasks.map(t => {
+        const master = DEFAULT_TASKS.find(m => m.id === t.id);
+        if (master && (master.label !== t.label || master.weight !== t.weight)) {
+          return { ...t, label: master.label, weight: master.weight };
+        }
+        return t;
+      });
+    }
+
     // Update existing day with new master tasks if they are missing
     const currentTaskIds = new Set(existing.tasks.map(t => t.id));
     const missingTasks = DEFAULT_TASKS.filter(t => {
