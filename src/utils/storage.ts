@@ -6,14 +6,15 @@ const STORAGE_KEY = 'life_os_data';
 export const DEFAULT_TASKS: DisciplineTask[] = [
   { id: 'p1', label: 'No Porn', weight: 3, category: 'DISCIPLINE', completed: false },
   { id: 'g1', label: 'No Gambling', weight: 3, category: 'DISCIPLINE', completed: false },
-  { id: 'ph1', label: 'No Phone Before Learning', weight: 2, category: 'DISCIPLINE', completed: false },
-  { id: 'nf1', label: 'No Netflix (Weekday)', weight: 2, category: 'DISCIPLINE', completed: false, weekdayOnly: true },
+  { id: 'ph1', label: 'No Social Media', weight: 2, category: 'DISCIPLINE', completed: false },
   { id: 'al1', label: 'No Alcohol', weight: 1, category: 'DISCIPLINE', completed: false },
   { id: 'sm1', label: 'No Smoking', weight: 1, category: 'DISCIPLINE', completed: false },
+  { id: 'sw1', label: 'No Sweets', weight: 1, category: 'DISCIPLINE', completed: false },
+  { id: 'nf1', label: 'No Netflix (Weekday)', weight: 2, category: 'DISCIPLINE', completed: false, weekdayOnly: true },
   { id: 'hw1', label: 'Homework / Learning', weight: 2, category: 'GROWTH', completed: false },
   { id: 'sb1', label: 'Serbian Practice', weight: 1, category: 'GROWTH', completed: false },
-  { id: 'bc1', label: '15min Ball Control', weight: 1, category: 'BODY', completed: false },
   { id: 'tr1', label: 'Training Done', weight: 2, category: 'BODY', completed: false },
+  { id: 'bc1', label: '15min Ball Control', weight: 1, category: 'BODY', completed: false },
   { id: 'sk1', label: 'Skin Routine', weight: 1, category: 'BODY', completed: false },
   { id: 'ps1', label: 'Looks Routine', weight: 2, category: 'BODY', completed: false },
   { id: 'w1', label: '3L Water', weight: 1, category: 'BODY', completed: false },
@@ -75,9 +76,16 @@ export const getDailyLog = (state: AppState, date: Date): DailyLog => {
     const existing = dailyLogs[dateKey];
     
     if (existing && existing.tasks && existing.reflection) {
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    
     // Update existing day with new master tasks if they are missing
     const currentTaskIds = new Set(existing.tasks.map(t => t.id));
-    const missingTasks = DEFAULT_TASKS.filter(t => !currentTaskIds.has(t.id));
+    const missingTasks = DEFAULT_TASKS.filter(t => {
+      if (currentTaskIds.has(t.id)) return false;
+      if (t.weekdayOnly && isWeekend) return false;
+      if (t.weekendOnly && !isWeekend) return false;
+      return true;
+    });
     
     if (missingTasks.length > 0 && !existing.locked) {
       existing.tasks = [...existing.tasks, ...missingTasks.map(t => ({ ...t }))];

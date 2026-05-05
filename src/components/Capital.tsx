@@ -92,7 +92,7 @@ export default function Capital({ state, streaks, addFinancialLog }: CapitalProp
 
       <section className="bg-zinc-950 border border-zinc-900 p-6 space-y-4">
         <div className="flex items-center gap-3 border-b border-zinc-900 pb-3">
-          <ShieldCheck className="w-5 h-5 text-zinc-100" />
+          <ShieldCheck className="w-5 h-5 text-zinc-500" />
           <h3 className="text-[10px] uppercase font-bold text-zinc-100 tracking-[0.2em]">Investment Standards</h3>
         </div>
         <div className="space-y-3">
@@ -124,12 +124,12 @@ export default function Capital({ state, streaks, addFinancialLog }: CapitalProp
         <div className="space-y-1">
           {state.financialLogs.slice(-5).reverse().map((log) => (
             <div key={log.id} className="flex justify-between items-center p-3 border border-zinc-900 text-xs">
-              <span className={cn("font-bold", log.type === 'SAVINGS' ? "text-zinc-100" : "text-blue-500")}>
+              <span className={cn("font-bold", log.type === 'SAVINGS' ? "text-zinc-100" : "text-zinc-400")}>
                 {log.type}
               </span>
               <div className="flex items-center gap-4">
-                <span className="font-mono">+€{log.amount}</span>
-                <span className="text-zinc-600">{new Date(log.date).toLocaleDateString()}</span>
+                <span className="font-mono text-zinc-100">+€{log.amount}</span>
+                <span className="text-zinc-600 font-mono text-[9px]">{new Date(log.date).toLocaleDateString()}</span>
               </div>
             </div>
           ))}
